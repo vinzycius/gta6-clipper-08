@@ -37,16 +37,19 @@ function loadVideoAddress(botDir: string): string | null {
   if (typeof url !== 'string') {
     throw new Error('VIDEO.json "url" must be a string');
   }
+  // A pasted address may carry stray whitespace; strip it before
+  // matching so a harmless copy-paste slip does not fail the entry.
+  const trimmed = url.trim();
   // The starter's placeholder is not a video, but it is not this
   // program's job to refuse it: pass it through unchanged and let the
   // gate refuse it (valid 0), exactly as the starter's copy does. The
   // program must still complete, placeholder or not.
-  if (url === PLACEHOLDER) {
+  if (url === PLACEHOLDER || trimmed === PLACEHOLDER) {
     return null;
   }
-  const match = VIDEO_URL.exec(url);
+  const match = VIDEO_URL.exec(trimmed);
   if (!match) {
-    throw new Error(`VIDEO.json does not name a YouTube video: ${url}`);
+    throw new Error(`VIDEO.json does not name a YouTube video: ${trimmed}`);
   }
   // Hand the gate one shape whatever the uploader pasted: the Shorts form.
   return `https://www.youtube.com/shorts/${match[3]}`;
